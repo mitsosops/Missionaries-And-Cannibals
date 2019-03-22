@@ -35,7 +35,7 @@ def a_star(_g, _node):
         visited.append(current_node)
 
         for neighbor in _g.neighbors(current_node):
-            if (_g.nodes[neighbor]['is_final'] and not _g.nodes[neighbor]['is_goal'])or neighbor in visited:
+            if (_g.nodes[neighbor]['is_final'] and not _g.nodes[neighbor]['is_goal']) or neighbor in visited:
                 continue
 
             neighbor_distance_from_start = distance_from_start[current_node] + 1
@@ -73,7 +73,7 @@ def solve_a_star():
     # Problem graph plot title
     plt.title("All Possible Problem Steps")
 
-    # Use networkx to draw the problem graph on the plot
+    # Draw the problem graph on the plot
     graph.draw_network(g, pos, color_map, labels, draw_weights=True)
 
     # #################### Solution #################### #
@@ -96,7 +96,7 @@ def solve_a_star():
     # Result graph plot title
     plt.title("A* Result: " + str(len(a_star_steps)) + " Steps")
 
-    # Use networkx to draw the result graph on the plot
+    # Draw the result graph on the plot
     graph.draw_network(g_result, pos_result, color_map_result, labels_result)
 
     graph.clear_axes(axes)

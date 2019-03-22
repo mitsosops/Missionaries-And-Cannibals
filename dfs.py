@@ -55,7 +55,7 @@ def solve_dfs():
     # Problem graph plot title
     plt.title("All Possible Problem Steps")
 
-    # Use networkx to draw the problem graph on the plot
+    # Draw the problem graph on the plot
     graph.draw_network(g, pos, color_map, labels)
 
     # #################### Solution #################### #
@@ -89,7 +89,7 @@ def solve_dfs():
     # Result graph plot title
     plt.title("DFS Result: " + str(len(dfs_result) - 1) + " Moves - " + str(len(dfs_steps)) + " Steps")
 
-    # Use networkx to draw the result graph on the plot
+    # Draw the result graph on the plot
     graph.draw_network(g_result, pos_result, color_map_result, labels_result)
 
     # Format the plots' appearance and add a custom legend to them
@@ -119,24 +119,24 @@ def solve_dfs():
     axes2 = []
 
     # Calculate the number of the required subplot rows and columns based on the number of solution steps
-    # Each row should have at most max_ncols subplots
-    max_ncols = 10
+    # Each row should have at most max_cols subplots
+    max_cols = 10
     num_of_states = len(dfs_states)
-    nrows = ceil(num_of_states/max_ncols)
-    ncols_last_row = num_of_states % max_ncols
+    num_rows = ceil(num_of_states/max_cols)
+    num_cols_last_row = num_of_states % max_cols
 
     # Add a variable for counting pops, this will help track the correct step number
     pop_count = 0
-    for r in range(1, nrows + 1):
-        ncols = max_ncols if r < nrows else ncols_last_row
-        for c in range(1, ncols + 1):
+    for r in range(1, num_rows + 1):
+        num_cols = max_cols if r < num_rows else num_cols_last_row
+        for c in range(1, num_cols + 1):
             # Calculate the index of the subplot which is also the DFS state number
-            idx = (r - 1) * max_ncols + c
+            idx = (r - 1) * max_cols + c
 
-            # Add a sublpot for the current state
-            axes2 += [plt.subplot(nrows, max_ncols, idx)]
+            # Add a subplot for the current state
+            axes2 += [plt.subplot(num_rows, max_cols, idx)]
 
-            # Get the nodes that were in the DFS stach at the current state
+            # Get the nodes that were in the DFS stack at the current state
             state_nodes = dfs_states[idx - 1][0]
 
             # Get the state type
@@ -146,7 +146,7 @@ def solve_dfs():
             pop_count += 1 if state_type == 'pop' else 0
 
             # Name the subplot.
-            # Substracting the pop count from the state number (idx) results in the actual DFS step number
+            # Subtracting the pop count from the state number (idx) results in the actual DFS step number
             plt.title('Step ' + str(idx - pop_count) + ('(pop)' if state_type == 'pop' else ''))
 
             # Copy the problem graph but filter out the nodes that were not included in the current state
