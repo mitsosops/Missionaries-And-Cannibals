@@ -1,19 +1,24 @@
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-import graph as g
-from math import ceil
+import graph
+
 
 # #################### Function declarations #################### #
-def a_star(_g, _node, stack = [], steps_to_solution = []):    
-    pass
+
+
+def a_star(_g, _node, stack=None, steps_to_solution=None):
+    if stack is None:
+        stack = []
+    if steps_to_solution is None:
+        steps_to_solution = []
+
 
 def solve_a_star():
     # #################### Preparation #################### #
     # Build problem graph
-    G, root_node = g.problem_graph()
+    g, root_node = graph.problem_graph()
 
     # Prepare problem graph's plot data 
-    pos, color_map, labels = g.prepare_plot_data(G)
+    pos, color_map, labels = graph.prepare_plot_data(g)
 
     # Create a figure for the problem graph and the result graph
     fig = plt.figure('Cannibals And Missionaries Problem And Solution With DFS', figsize=(20, 10))
@@ -31,7 +36,7 @@ def solve_a_star():
     plt.title("All Possible Problem Steps")
 
     # Use networkx to draw the problem graph on the plot
-    g.draw_network(G, pos, color_map, labels, draw_weights=True)
+    graph.draw_network(g, pos, color_map, labels, draw_weights=True)
 
     # #################### Solution #################### #
     pass
@@ -39,6 +44,7 @@ def solve_a_star():
 
 if __name__ == "__main__":
     import os
+
     if not os.path.exists('dist'):
         os.makedirs('dist')
     solve_a_star()
