@@ -35,7 +35,7 @@ def a_star(_g, _node):
         visited.append(current_node)
 
         for neighbor in _g.neighbors(current_node):
-            if (_g.nodes[neighbor]['is_final'] and not _g.nodes[neighbor]['is_goal']) or neighbor in visited:
+            if _g.nodes[neighbor]['is_bad'] or neighbor in visited:
                 continue
 
             neighbor_distance_from_start = distance_from_start[current_node] + 1

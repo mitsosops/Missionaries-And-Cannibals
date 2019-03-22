@@ -18,7 +18,7 @@ def dfs(_g, _node, stack=None, steps_to_solution=None):
     node_data['visited'] = True
     if node_data['is_goal']:
         return stack, steps_to_solution
-    elif node_data['is_final']:
+    elif node_data['is_bad']:
         stack.pop()
         steps_to_solution.append((list(stack), 'pop'))
         return [], steps_to_solution

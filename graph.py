@@ -46,7 +46,7 @@ def problem_graph():
 
         return build_node(_starting_bank, _ending_bank)
 
-    def is_final(_node):
+    def get_flags(_node):
         _starting_bank = list(_node[0])
         _ending_bank = list(_node[1])
 
@@ -62,17 +62,17 @@ def problem_graph():
             if (new_node is not None) and (not _g.has_edge(_node, new_node)):
                 _g.add_edge(_node, new_node)
 
-                _is_final, is_goal, is_root = is_final(_node)
-                _g.nodes[_node]['is_final'] = False if is_goal else _is_final
+                _is_bad, is_goal, is_root = get_flags(_node)
+                _g.nodes[_node]['is_bad'] = False if is_goal else _is_bad
                 _g.nodes[_node]['is_goal'] = is_goal
                 _g.nodes[_node]['is_root'] = is_root
 
-                _is_final, is_goal, is_root = is_final(new_node)
-                _g.nodes[new_node]['is_final'] = False if is_goal else _is_final
+                _is_bad, is_goal, is_root = get_flags(new_node)
+                _g.nodes[new_node]['is_bad'] = False if is_goal else _is_bad
                 _g.nodes[new_node]['is_goal'] = is_goal
                 _g.nodes[new_node]['is_root'] = is_root
 
-                if not _is_final:
+                if not _is_bad:
                     build_graph(_g, new_node)
 
     def set_levels(_g, _node, _level=0):
@@ -123,7 +123,7 @@ def prepare_plot_data(_g):
             color_map.append('deepskyblue')
         elif node_data['is_goal']:
             color_map.append('limegreen')
-        elif node_data['is_final']:
+        elif node_data['is_bad']:
             color_map.append('orangered')
         else:
             color_map.append('gold')
