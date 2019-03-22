@@ -13,7 +13,7 @@ def DFS(_g, _node, stack = [], steps_to_solution = []):
     steps_to_solution.append((list(stack), 'stack'))
     node_data = _g.nodes[_node]
     node_data['visited'] = True
-    if node_data['is_result']:
+    if node_data['is_goal']:
         return stack, steps_to_solution
     elif node_data['is_final']:
         stack.pop()

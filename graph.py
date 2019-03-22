@@ -66,14 +66,14 @@ def problem_graph():
             if (new_node is not None) and (not _g.has_edge(_node, new_node)):
                 _g.add_edge(_node, new_node)
                                 
-                _is_final, is_result, is_root = is_final(_node)
+                _is_final, is_goal, is_root = is_final(_node)
                 _g.nodes[_node]['is_final'] = _is_final
-                _g.nodes[_node]['is_result'] = is_result
+                _g.nodes[_node]['is_goal'] = is_goal
                 _g.nodes[_node]['is_root'] = is_root
 
-                _is_final, is_result, is_root = is_final(new_node)
+                _is_final, is_goal, is_root = is_final(new_node)
                 _g.nodes[new_node]['is_final'] = _is_final
-                _g.nodes[new_node]['is_result'] = is_result
+                _g.nodes[new_node]['is_goal'] = is_goal
                 _g.nodes[new_node]['is_root'] = is_root
 
                 if not _is_final:
@@ -90,6 +90,7 @@ def problem_graph():
                 _g.nodes[neighbor]['level'] = _level + 1
                 set_levels(_g, neighbor, _level + 1)
 
+    
 
     build_graph(G, root_node)
     set_levels(G, root_node)
@@ -109,7 +110,7 @@ def prepare_plot_data(_g):
         level = node_data['level']
         if node_data['is_root']:
             color_map.append('deepskyblue')
-        elif node_data['is_result']:
+        elif node_data['is_goal']:
             color_map.append('limegreen')
         elif node_data['is_final']:
             color_map.append('orangered')
