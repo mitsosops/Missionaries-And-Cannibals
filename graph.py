@@ -63,12 +63,12 @@ def problem_graph():
                 _g.add_edge(_node, new_node)
 
                 _is_final, is_goal, is_root = is_final(_node)
-                _g.nodes[_node]['is_final'] = _is_final
+                _g.nodes[_node]['is_final'] = False if is_goal else _is_final
                 _g.nodes[_node]['is_goal'] = is_goal
                 _g.nodes[_node]['is_root'] = is_root
 
                 _is_final, is_goal, is_root = is_final(new_node)
-                _g.nodes[new_node]['is_final'] = _is_final
+                _g.nodes[new_node]['is_final'] = False if is_goal else _is_final
                 _g.nodes[new_node]['is_goal'] = is_goal
                 _g.nodes[new_node]['is_root'] = is_root
 
