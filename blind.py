@@ -1,10 +1,6 @@
-import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from graph import (problem_graph,
-                   prepare_plot_data,
-                   filter_graph_copy,
-                   align_positions)
+import graph as g
 from math import ceil
 
 # #################### Function declarations #################### #
@@ -28,32 +24,13 @@ def DFS(_g, _node, stack = [], steps_to_solution = []):
         steps_to_solution.append((list(stack), 'pop'))
         return [], steps_to_solution
 
-def clear_axes(axes):
-    for ax in axes:
-        ax.set_xticks([])
-        ax.set_yticks([])
-
-def add_legend(axis, pos):        
-    legend_elements = [Line2D([0], [0], marker='o', color='deepskyblue', label='Starting State', markerfacecolor='deepskyblue', markersize=10),
-                    Line2D([0], [0], marker='o', color='gold', label='Valid Move - River crossed safely', markerfacecolor='gold', markersize=10),
-                    Line2D([0], [0], marker='o', color='orangered', label='Wrong Move - Missionaries are cannibalized', markerfacecolor='orangered', markersize=10),
-                    Line2D([0], [0], marker='o', color='limegreen', label='Solution - Everyone has crossed the river', markerfacecolor='limegreen', markersize=10)]
-
-    axis.legend(handles=legend_elements, bbox_to_anchor=pos)
-
-
-def draw_network(_g, pos, color_map, labels, node_size=1250, font_size=8):
-    nx.draw_networkx_nodes(_g, pos, node_color=color_map, node_size=node_size)
-    nx.draw_networkx_edges(_g, pos, alpha=0.2)
-    nx.draw_networkx_labels(_g, pos, labels, font_size=font_size)
-
 def blind():
     # #################### Preparation #################### #
     # Build problem graph
-    G, root_node = problem_graph()
+    G, root_node = g.problem_graph()
 
     # Prepare problem graph's plot data 
-    pos, color_map, labels = prepare_plot_data(G)
+    pos, color_map, labels = g.prepare_plot_data(G)
 
     # Create a figure for the problem graph and the result graph
     fig = plt.figure('Cannibals And Missionaries Problem And Solution With DFS', figsize=(20, 10))
@@ -71,7 +48,7 @@ def blind():
     plt.title("All Possible Problem Steps")
 
     # Use networkx to draw the problem graph on the plot
-    draw_network(G, pos, color_map, labels)
+    g.draw_network(G, pos, color_map, labels)
 
     # #################### Solution #################### #
     # Run DFS on the problem graph and keep the search steps in a separate variable for plotting
@@ -87,14 +64,14 @@ def blind():
     dfs_steps = [s for s in dfs_states if s[1] == 'stack']
 
     # Make a copy of the problem network and discard the nodes that were not used in the solution
-    G_result = filter_graph_copy(G, dfs_result)
+    G_result = g.filter_graph_copy(G, dfs_result)
 
     # Prepare plot data for the resulting graph
-    pos_result, color_map_result, labels_result = prepare_plot_data(G_result) 
+    pos_result, color_map_result, labels_result = g.prepare_plot_data(G_result) 
 
     # Since the position of the nodes is calculated based on the number of the nodes per level,
     # remap their position to match the original, which was calculated when preparing the problem's plot data
-    pos_result = align_positions(pos, pos_result)
+    pos_result = g.align_positions(pos, pos_result)
 
     # Create the second subplot for the result's network graph
     axes += [plt.subplot(1, 2, 2)]
@@ -103,11 +80,15 @@ def blind():
     plt.title("DFS Result: " + str(len(dfs_result) - 1) + " Moves - " + str(len(dfs_steps)) + " Steps")
 
     # Use networkx to draw the result graph on the plot
-    draw_network(G_result, pos_result, color_map_result, labels_result)
+    g.draw_network(G_result, pos_result, color_map_result, labels_result)
 
     # Format the plots' appearance and add a custom legend to them
-    clear_axes(axes)
-    add_legend(axes[1],(0.15, 0))
+    g.clear_axes(axes)        
+    legend_elements = [Line2D([0], [0], marker='o', color='deepskyblue', label='Starting State', markerfacecolor='deepskyblue', markersize=10),
+                    Line2D([0], [0], marker='o', color='gold', label='Valid Move - River crossed safely', markerfacecolor='gold', markersize=10),
+                    Line2D([0], [0], marker='o', color='orangered', label='Wrong Move - Missionaries are cannibalized', markerfacecolor='orangered', markersize=10),
+                    Line2D([0], [0], marker='o', color='limegreen', label='Solution - Everyone has crossed the river', markerfacecolor='limegreen', markersize=10)]
+    g.add_legend(legend_elements, axes[1],(0.15, 0))
 
     plt.savefig("dist/DFS_Problem_Solution_Figure.png", bbox_inches='tight')
 
@@ -152,20 +133,21 @@ def blind():
             plt.title('Step ' + str(idx - pop_count) + ('(pop)' if state_type == 'pop' else ''))
 
             # Copy the problem graph but filter out the nodes that were not included in the current state
-            G_state = filter_graph_copy(G, state_nodes)
+            G_state = g.filter_graph_copy(G, state_nodes)
 
             # Prepare plot data for the current state
-            pos_state, color_map_state, labels_state = prepare_plot_data(G_state)
+            pos_state, color_map_state, labels_state = g.prepare_plot_data(G_state)
 
             # Reset node positions to match the problem graph
-            pos_state = align_positions(pos, pos_state)
+            pos_state = g.align_positions(pos, pos_state)
 
             # Draw the state graph using smaller node and font sizes
-            draw_network(G_state, pos_state, color_map_state, labels_state,node_size=250, font_size=6)
+            g.draw_network(G_state, pos_state, color_map_state, labels_state,node_size=250, font_size=6)
 
-    clear_axes(axes2)
+    g.clear_axes(axes2)
 
     plt.savefig("dist/DFS_Solution_Steps_Figure.png", bbox_inches='tight')
+
 
 if __name__ == "__main__":
     import os

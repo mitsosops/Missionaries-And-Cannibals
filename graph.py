@@ -90,10 +90,31 @@ def problem_graph():
                 _g.nodes[neighbor]['level'] = _level + 1
                 set_levels(_g, neighbor, _level + 1)
 
+
+    def get_goal_node(_g):
+        for _node in list(_g.nodes)[::-1]:
+            if _g.nodes[_node]['is_goal']:
+                return _node
+
+
+
+    def set_heuristic_weights(_g, _node, weight = 0):
+        if(weight == 0):
+            for edge in _g.edges:
+                _g.edges[edge]['weight'] = 0
+
+        for neighbor in _g.neighbors(_node):
+            current_weight = _g[_node][neighbor]['weight']
+            if current_weight > weight + 1 or current_weight == 0:
+                _g[_node][neighbor]['weight'] = weight + 1
+                set_heuristic_weights(_g, neighbor, weight + 1)
+
     
 
     build_graph(G, root_node)
     set_levels(G, root_node)
+    goal_node = get_goal_node(G)
+    set_heuristic_weights(G, goal_node)
     return G, root_node
 
 
@@ -159,3 +180,25 @@ def filter_graph_copy(_g, nodes_to_keep):
 def align_positions(pos_origin, pos_target):
     aligned_pos = {k: pos_origin[k] for k in pos_target }
     return aligned_pos
+
+
+def draw_network(_g, pos, color_map, labels, node_size=1250, font_size=8, draw_weights = False):
+    nx.draw_networkx_nodes(_g, pos, node_color=color_map, node_size=node_size)
+    nx.draw_networkx_edges(_g, pos, alpha=0.2)
+    nx.draw_networkx_labels(_g, pos, labels, font_size=font_size)
+    if draw_weights:
+        nx.draw_networkx_edge_labels(_g,pos,edge_labels=nx.get_edge_attributes(_g,'weight'))
+
+
+def clear_axes(axes):
+    for ax in axes:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+
+def add_legend(legend_elements, axis, pos):
+    axis.legend(handles=legend_elements, bbox_to_anchor=pos)
+
+
+if __name__ == "__main__":
+    problem_graph()
