@@ -10,14 +10,14 @@ from math import ceil
 # #################### Function declarations #################### #
 def DFS(_g, _node, stack = [], steps_to_solution = []):    
     stack.append(_node)
-    steps_to_solution.append(list(stack))
+    steps_to_solution.append((list(stack), 'stack'))
     node_data = _g.nodes[_node]
     node_data['visited'] = True
     if node_data['is_result']:
         return stack, steps_to_solution
     elif node_data['is_final']:
         stack.pop()
-        steps_to_solution.append(list(stack))
+        steps_to_solution.append((list(stack), 'pop'))
         return [], steps_to_solution
     else:
         for neighbor in (nb for nb in _g.neighbors(_node) if 'visited' not in _g.nodes[nb].keys()):
@@ -25,7 +25,7 @@ def DFS(_g, _node, stack = [], steps_to_solution = []):
             if search_result != []:
                 return search_result, steps_to_solution
         stack.pop()
-        steps_to_solution.append(list(stack))
+        steps_to_solution.append((list(stack), 'pop'))
         return [], steps_to_solution
 
 def clear_axes(axes):
@@ -80,7 +80,11 @@ def blind():
     # only returns when it finds the solution node, where everyone has crossed the river.
     # This specialized DFS also keeps a track of the traversal steps when adding or popping a node from the stack. Node removals from the stack
     # are tracked in order for the steps to be coherent when plotted side by side
-    dfs_result, dfs_steps = DFS(G, root_node)
+    dfs_result, dfs_states = DFS(G, root_node)
+
+    # The steps are actually the number of unique node visits. It is calculated by counting only the number of stack additions in the resulting states
+    # and not the  number of stack removals
+    dfs_steps = [s for s in dfs_states if s[1] == 'stack']
 
     # Make a copy of the problem network and discard the nodes that were not used in the solution
     G_result = filter_graph_copy(G, dfs_result)
@@ -96,7 +100,7 @@ def blind():
     axes += [plt.subplot(1, 2, 2)]
 
     # Result graph plot title
-    plt.title("DFS Result: " + str(len(dfs_result) - 1) + " Moves")
+    plt.title("DFS Result: " + str(len(dfs_result) - 1) + " Moves - " + str(len(dfs_steps)) + " Steps")
 
     # Use networkx to draw the result graph on the plot
     draw_network(G_result, pos_result, color_map_result, labels_result)
@@ -120,36 +124,44 @@ def blind():
     # Calculate the number of the required subplot rows and columns based on the number of solution steps
     # Each row should have at most max_ncols subplots
     max_ncols = 10
-    num_of_steps = len(dfs_steps)
-    nrows = ceil(num_of_steps/max_ncols)
-    ncols_last_row = num_of_steps % max_ncols
+    num_of_states = len(dfs_states)
+    nrows = ceil(num_of_states/max_ncols)
+    ncols_last_row = num_of_states % max_ncols
 
+    # Add a variable for counting pops, this will help track the correct step number
+    pop_count = 0
     for r in range(1, nrows + 1):
         ncols = max_ncols if r < nrows else ncols_last_row
         for c in range(1, ncols + 1):
-            # Calculate the index of the subplot which is also the DFS step number
+            # Calculate the index of the subplot which is also the DFS state number
             idx = (r - 1) * max_ncols + c
 
-            # Add a sublpot for the current step
+            # Add a sublpot for the current state
             axes2 += [plt.subplot(nrows, max_ncols, idx)]
 
-            # Name the subplot
-            plt.title('Step ' + str(idx))
+            # Get the nodes that were in the DFS stach at the current state
+            state_nodes = dfs_states[idx - 1][0]
 
-            # Get the nodes that were in the DFS stach at the current step
-            step_nodes = dfs_steps[idx - 1]
+            # Get the state type
+            state_type = dfs_states[idx - 1][1]
 
-            # Copy the problem graph but filter out the nodes that were not included in the current step
-            G_step = filter_graph_copy(G, step_nodes)
+            # If the state type is 'pop' then increase the pop counter
+            pop_count += 1 if state_type == 'pop' else 0
 
-            # Prepare plot data for the current step
-            pos_step, color_map_step, labels_step = prepare_plot_data(G_step)
+            # Name the subplot. Substracting the pop count from the state number (idx) results in the actual DFS step number
+            plt.title('Step ' + str(idx - pop_count) + ('(pop)' if state_type == 'pop' else ''))
+
+            # Copy the problem graph but filter out the nodes that were not included in the current state
+            G_state = filter_graph_copy(G, state_nodes)
+
+            # Prepare plot data for the current state
+            pos_state, color_map_state, labels_state = prepare_plot_data(G_state)
 
             # Reset node positions to match the problem graph
-            pos_step = align_positions(pos, pos_step)
+            pos_state = align_positions(pos, pos_state)
 
-            # Draw the step graph using smaller node and font sizes
-            draw_network(G_step, pos_step, color_map_step, labels_step,node_size=250, font_size=6)
+            # Draw the state graph using smaller node and font sizes
+            draw_network(G_state, pos_state, color_map_state, labels_state,node_size=250, font_size=6)
 
     clear_axes(axes2)
 
