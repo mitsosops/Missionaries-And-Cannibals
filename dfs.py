@@ -4,7 +4,7 @@ import graph as g
 from math import ceil
 
 # #################### Function declarations #################### #
-def DFS(_g, _node, stack = [], steps_to_solution = []):    
+def dfs(_g, _node, stack = [], steps_to_solution = []):
     stack.append(_node)
     steps_to_solution.append((list(stack), 'stack'))
     node_data = _g.nodes[_node]
@@ -17,14 +17,14 @@ def DFS(_g, _node, stack = [], steps_to_solution = []):
         return [], steps_to_solution
     else:
         for neighbor in (nb for nb in _g.neighbors(_node) if 'visited' not in _g.nodes[nb].keys()):
-            search_result, _ = DFS(_g, neighbor, stack, steps_to_solution)
+            search_result, _ = dfs(_g, neighbor, stack, steps_to_solution)
             if search_result != []:
                 return search_result, steps_to_solution
         stack.pop()
         steps_to_solution.append((list(stack), 'pop'))
         return [], steps_to_solution
 
-def blind():
+def solve_dfs():
     # #################### Preparation #################### #
     # Build problem graph
     G, root_node = g.problem_graph()
@@ -57,7 +57,7 @@ def blind():
     # only returns when it finds the solution node, where everyone has crossed the river.
     # This specialized DFS also keeps a track of the traversal steps when adding or popping a node from the stack. Node removals from the stack
     # are tracked in order for the steps to be coherent when plotted side by side
-    dfs_result, dfs_states = DFS(G, root_node)
+    dfs_result, dfs_states = dfs(G, root_node)
 
     # The steps are actually the number of unique node visits. It is calculated by counting only the number of stack additions in the resulting states
     # and not the  number of stack removals
@@ -153,4 +153,4 @@ if __name__ == "__main__":
     import os
     if not os.path.exists('dist'):
         os.makedirs('dist')
-    blind()
+    solve_dfs()
