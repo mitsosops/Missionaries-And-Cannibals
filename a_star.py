@@ -94,7 +94,7 @@ def solve_a_star():
     axes += [plt.subplot(1, 2, 2)]
 
     # Result graph plot title
-    plt.title("A* Result: " + str(len(a_star_steps)) + " Steps")
+    plt.title("A* Result: " + str(len(a_star_result) - 1) + " Moves - " + str(len(a_star_steps)) + " Steps")
 
     # Draw the result graph on the plot
     graph.draw_network(g_result, pos_result, color_map_result, labels_result)
