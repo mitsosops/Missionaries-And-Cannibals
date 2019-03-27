@@ -1,5 +1,6 @@
-import networkx as nx
 from copy import deepcopy
+
+import networkx as nx
 
 
 def problem_graph():
@@ -128,8 +129,9 @@ def prepare_plot_data(_g):
         else:
             color_map.append('gold')
 
-        label = (str(starting_bank.count('m')) + str(starting_bank.count('c')) + ('b' if 'b' in starting_bank else '') +
-                 str(ending_bank.count('m')) + str(ending_bank.count('c')) + ('b' if 'b' in ending_bank else ''))
+        label = "{}{}{}{}{}{}".format(starting_bank.count('m'), starting_bank.count('c'),
+                                      ('b' if 'b' in starting_bank else ''), ending_bank.count('m'),
+                                      ending_bank.count('c'), ('b' if 'b' in ending_bank else ''))
         labels[_node] = label
 
         if level not in level_counts.keys():

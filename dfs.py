@@ -1,7 +1,10 @@
+from math import ceil
+
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+
 import graph
-from math import ceil
+
 
 # #################### Function declarations #################### #
 
@@ -87,7 +90,7 @@ def solve_dfs():
     axes += [plt.subplot(1, 2, 2)]
 
     # Result graph plot title
-    plt.title("DFS Result: " + str(len(dfs_result) - 1) + " Moves - " + str(len(dfs_steps)) + " Steps")
+    plt.title("DFS Result: {} Moves - {} Steps".format(len(dfs_result) - 1, len(dfs_steps)))
 
     # Draw the result graph on the plot
     graph.draw_network(g_result, pos_result, color_map_result, labels_result)

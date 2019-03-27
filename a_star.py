@@ -1,16 +1,18 @@
+from math import ceil
+
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
+
 import graph
-from math import ceil
-from matplotlib.colors import to_rgba
 
 
 # #################### Function declarations #################### #
 
-def heuristic(_g, _node, scale = 1.0):
+def heuristic(_g, _node, scale=1.0):
     # Get the min weight of the adjacent edges which is the shortest distance to the end
-    # A scale is used to set the importance of the heuristic function (h(n)) when calculating the estimated distance to goal (f(n))
+    # A scale is used to set the importance of the heuristic function (h(n))
+    # when calculating the estimated distance to goal (f(n))
     # against the cost - distance from start (g(n))
     if _g.nodes[_node]['is_goal']:
         return 0
@@ -31,7 +33,8 @@ def a_star(_g, _node):
         frontier.remove(current_node)
 
         if _g.nodes[current_node]['is_goal']:
-            steps_to_solution.append({'current_node': current_node, 'frontier': list(frontier), 'visited': list(visited)})
+            steps_to_solution.append({'current_node': current_node, 'frontier': list(frontier),
+                                      'visited': list(visited)})
             path = [current_node]
             while current_node in origins.keys():
                 current_node = origins[current_node]
@@ -54,7 +57,7 @@ def a_star(_g, _node):
             origins[neighbor] = current_node
             distance_from_start[neighbor] = neighbor_distance_from_start
             # In this problem, most of the time, getting closer to the goal (minimizing straight line distance)
-            # is the best path since there are no concave obstacles. Hence, an arbitary scale of 2 is chosen to 
+            # is the best path since there are no concave obstacles. Hence, an arbitrary scale of 2 is chosen to
             # make the heuristic twice as important as cost - distance from the start.
             estimated_distance_to_goal[neighbor] = neighbor_distance_from_start + heuristic(_g, neighbor, scale=2)
             
@@ -112,7 +115,8 @@ def solve_a_star():
     # Since the graphs for these types of problems are relatively simple,
     # a stronger heuristic usually gives us the best path in the shortest time possible (steps/iterations).
     # Therefore a scale parameter is added to the heuristic function.
-    # As for the solution steps, the following information is tracked for each one of them: current node, frontier nodes and visited nodes.
+    # As for the solution steps, the following information is tracked for each one of them:
+    # current node, frontier nodes and visited nodes.
     # This allows us to plot the whole graph verbosely, knowing exactly the state of the A* after each iteration.
     a_star_result, a_star_steps = a_star(g, root_node)
 
@@ -130,7 +134,7 @@ def solve_a_star():
     axes += [plt.subplot(1, 2, 2)]
 
     # Result graph plot title
-    plt.title("A* Result: " + str(len(a_star_result) - 1) + " Moves - " + str(len(a_star_steps)) + " Steps")
+    plt.title("A* Result: {} Moves - {} Steps".format(len(a_star_result) - 1, len(a_star_steps)))
 
     # Draw the result graph on the plot
     graph.draw_network(g_result, pos_result, color_map_result, labels_result)
@@ -147,7 +151,8 @@ def solve_a_star():
                               label='Solution - Everyone has crossed the river', markerfacecolor='limegreen',
                               markersize=10),
                        Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0,
-                              label="The line numbers show the 'straight-line distance' to the goal")]
+                                 label="The line numbers show the 'straight-line distance' to the goal")]
+
     graph.add_legend(legend_elements, axes[1], (0.15, 0))
 
     plt.savefig("dist/A_Star_Problem_Solution_Figure.png", bbox_inches='tight')
@@ -180,7 +185,7 @@ def solve_a_star():
 
             # Name the subplot.
             # Subtracting the pop count from the step number (idx) results in the actual DFS step number
-            plt.title('Step ' + str(idx))
+            plt.title('Step {}'.format(idx))
 
             # Get the data of the current step (A* state)
             step_data = a_star_steps[idx - 1]
@@ -189,7 +194,8 @@ def solve_a_star():
             pos_step, color_map_step, labels_step = graph.prepare_plot_data(g)
 
             # Create a new color map for our nodes, that better depicts the state of the A* at each step
-            color_map_step = set_a_star_colors(g, step_data['current_node'], step_data['frontier'], step_data['visited'])
+            color_map_step = set_a_star_colors(g, step_data['current_node'],
+                                               step_data['frontier'], step_data['visited'])
 
             # Draw the step graph using smaller node and font sizes
             graph.draw_network(g, pos_step, color_map_step, labels_step, node_size=250, font_size=6)
