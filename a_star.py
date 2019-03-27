@@ -81,10 +81,11 @@ def set_a_star_colors(_g, current_node, frontier, visited):
     return color_map
 
 
-def solve_a_star():
+def solve_a_star(g=None, root_node=None):
     # #################### Preparation #################### #
     # Build problem graph
-    g, root_node = graph.problem_graph()
+    if g is None or root_node is None:
+        g, root_node = graph.problem_graph()
 
     # Prepare problem graph's plot data 
     pos, color_map, labels = graph.prepare_plot_data(g)
@@ -218,6 +219,8 @@ def solve_a_star():
     graph.add_legend(legend_elements, axes2[len(axes2) - 1], (1, 0.65))
 
     plt.savefig("dist/A_Star_Solution_Steps_Figure.png", bbox_inches='tight')
+
+    return g, root_node
 
 
 if __name__ == "__main__":

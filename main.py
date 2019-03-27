@@ -7,5 +7,5 @@ if __name__ == "__main__":
     if not os.path.exists('dist'):
         os.makedirs('dist')
 
-    solve_dfs()
-    solve_a_star()
+    graph, root_node = solve_dfs()
+    solve_a_star(graph, root_node)
