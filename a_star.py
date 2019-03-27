@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
 import graph
+from math import ceil
+from matplotlib.colors import to_rgba
 
 
 # #################### Function declarations #################### #
 
-def heuristic(_g, _node):
+def heuristic(_g, _node, scale = 1.0):
     # Get the min weight of the adjacent edges which is the shortest distance to the end
-    return min([edge[2]['weight'] for edge in _g.edges(_node, data=True)])
+    if _g.nodes[_node]['is_goal']:
+        return 0
+    return min([edge[2]['weight'] for edge in _g.edges(_node, data=True)]) * scale
 
 
 def a_star(_g, _node):
@@ -23,9 +28,8 @@ def a_star(_g, _node):
         current_node = sorted(frontier, key=lambda node: estimated_distance_to_goal[node])[0]
         frontier.remove(current_node)
 
-        steps_to_solution.append({'current_node': current_node, 'frontier': frontier, 'visited': visited})
-
         if _g.nodes[current_node]['is_goal']:
+            steps_to_solution.append({'current_node': current_node, 'frontier': list(frontier), 'visited': list(visited)})
             path = [current_node]
             while current_node in origins.keys():
                 current_node = origins[current_node]
@@ -47,7 +51,26 @@ def a_star(_g, _node):
 
             origins[neighbor] = current_node
             distance_from_start[neighbor] = neighbor_distance_from_start
-            estimated_distance_to_goal[neighbor] = neighbor_distance_from_start + heuristic(_g, neighbor)
+            estimated_distance_to_goal[neighbor] = neighbor_distance_from_start + heuristic(_g, neighbor, scale=2)
+            
+        steps_to_solution.append({'current_node': current_node, 'frontier': list(frontier), 'visited': list(visited)})
+
+
+def set_a_star_colors(_g, current_node, frontier, visited):
+    color_map = []
+    for node in _g.nodes:
+        if node == current_node:
+            color_map.append('dodgerblue')
+        elif node in frontier:
+            color_map.append('goldenrod')
+        elif node in visited:
+            color_map.append('greenyellow')
+        elif _g.nodes[node]['is_bad']:
+            color_map.append('palevioletred')
+        else:
+            color_map.append('gainsboro')
+    
+    return color_map
 
 
 def solve_a_star():
@@ -109,10 +132,71 @@ def solve_a_star():
                               markersize=10),
                        Line2D([0], [0], marker='o', color='limegreen',
                               label='Solution - Everyone has crossed the river', markerfacecolor='limegreen',
-                              markersize=10)]
+                              markersize=10),
+                       Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0,
+                              label="The line numbers show the 'straight-line distance' to the goal")]
     graph.add_legend(legend_elements, axes[1], (0.15, 0))
 
-    plt.show()
+    plt.savefig("dist/A_Star_Problem_Solution_Figure.png", bbox_inches='tight')
+
+    # #################### Solution Analysis #################### #
+    # Create a new figure for solution step plotting
+    fig2 = plt.figure('Cannibals And Missionaries Solution Steps With A*', figsize=(20, 10))
+
+    # Set figure title
+    fig2.suptitle('Cannibals And Missionaries Problem - A* Solution Steps', fontsize=16)
+
+    # Keep all the axes created in a list for easy switching
+    axes2 = []
+
+    # Calculate the number of the required subplot rows and columns based on the number of solution steps
+    # Each row should have at most max_cols subplots
+    max_cols = 8
+    num_of_steps = len(a_star_steps)
+    num_rows = ceil(num_of_steps/max_cols)
+    num_cols_last_row = num_of_steps % max_cols
+    
+    for r in range(1, num_rows + 1):
+        num_cols = max_cols if r < num_rows else num_cols_last_row
+        for c in range(1, num_cols + 1):
+            # Calculate the index of the subplot which is also the DFS step number
+            idx = (r - 1) * max_cols + c
+
+            # Add a subplot for the current step
+            axes2 += [plt.subplot(num_rows, max_cols, idx)]
+
+            # Name the subplot.
+            # Subtracting the pop count from the step number (idx) results in the actual DFS step number
+            plt.title('Step ' + str(idx))
+
+            step_data = a_star_steps[idx - 1]
+
+            # Prepare plot data for the current step
+            pos_step, color_map_step, labels_step = graph.prepare_plot_data(g)
+
+            color_map_step = set_a_star_colors(g, step_data['current_node'], step_data['frontier'], step_data['visited'])
+
+            # Draw the step graph using smaller node and font sizes
+            graph.draw_network(g, pos_step, color_map_step, labels_step, node_size=250, font_size=6)
+
+    graph.clear_axes(axes2)
+
+    legend_elements = [Line2D([0], [0], marker='o', color='gainsboro',
+                              label='Unvisited Node', markerfacecolor='gainsboro', markersize=10),
+                       Line2D([0], [0], marker='o', color='palevioletred',
+                              label='Bad/Ignored Node', markerfacecolor='palevioletred', markersize=10),
+                       Line2D([0], [0], marker='o', color='greenyellow',
+                              label='Visited Node', markerfacecolor='greenyellow',
+                              markersize=10),
+                       Line2D([0], [0], marker='o', color='goldenrod',
+                              label='Frontier Node', markerfacecolor='goldenrod',
+                              markersize=10),
+                       Line2D([0], [0], marker='o', color='dodgerblue',
+                              label='Current Node', markerfacecolor='dodgerblue',
+                              markersize=10)]
+    graph.add_legend(legend_elements, axes2[len(axes2) - 1], (1, 0.65))
+
+    plt.savefig("dist/A_Star_Solution_Steps_Figure.png", bbox_inches='tight')
 
 
 if __name__ == "__main__":
