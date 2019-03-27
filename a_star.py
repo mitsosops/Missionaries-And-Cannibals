@@ -10,16 +10,30 @@ import graph
 # #################### Function declarations #################### #
 
 def heuristic(_g, _node, scale=1.0):
-    # Get the min weight of the adjacent edges which is the shortest distance to the end
-    # A scale is used to set the importance of the heuristic function (h(n))
-    # when calculating the estimated distance to goal (f(n))
-    # against the cost - distance from start (g(n))
+    """
+    Heuristic function that returns the min distance between the passed node and the goal.
+
+    :param _g: The graph whose nodes to calculate the heuristic for.
+    :param _node: The node whose heuristic to calculate.
+    :param scale: The scale is used to set the importance of the heuristic function (h(n))
+                  when calculating the estimated distance to goal (f(n))
+                  against the cost - distance from start (g(n))
+    :return: The min weight of the supplied node's adjacent edges which is the shortest distance to the end
+    """
+
     if _g.nodes[_node]['is_goal']:
         return 0
     return min([edge[2]['weight'] for edge in _g.edges(_node, data=True)]) * scale
 
 
 def a_star(_g, _node):
+    """
+    Run A* against the passed graph starting with the passed node.
+
+    :param _g: The graph on which to run the dfs.
+    :param _node: The node from which the A* search begins.
+    :return: The result path and the steps the algorithm made before reaching the goal node.
+    """
     steps_to_solution = []
 
     visited = []
@@ -81,11 +95,15 @@ def set_a_star_colors(_g, current_node, frontier, visited):
     return color_map
 
 
-def solve_a_star(g=None, root_node=None):
+def solve_a_star(g, root_node):
+    """
+    Solve the problem by running an A* search on the provided graph starting from the provided node.
+    Plots the problem graph, the result graph (path from root to goal) and the state of the A* after each iteration.
+
+    :param g: The problem graph.
+    :param root_node: The starting node of the graph.
+    """
     # #################### Preparation #################### #
-    # Build problem graph
-    if g is None or root_node is None:
-        g, root_node = graph.problem_graph()
 
     # Prepare problem graph's plot data 
     pos, color_map, labels = graph.prepare_plot_data(g)
@@ -220,12 +238,10 @@ def solve_a_star(g=None, root_node=None):
 
     plt.savefig("dist/A_Star_Solution_Steps_Figure.png", bbox_inches='tight')
 
-    return g, root_node
-
 
 if __name__ == "__main__":
     import os
 
     if not os.path.exists('dist'):
         os.makedirs('dist')
-    solve_a_star()
+    solve_a_star(*graph.problem_graph())

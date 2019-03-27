@@ -10,6 +10,16 @@ import graph
 
 
 def dfs(_g, _node, stack=None, steps_to_solution=None):
+    """
+    Run dfs against the passed graph starting with the passed node.
+
+    :param _g: The graph on which to run the dfs.
+    :param _node: The node from which this recursion of dfs begins.
+    :param stack: The dfs stack. Do not pass this arguments. It is only to be used from the function itself.
+    :param steps_to_solution: The steps to solution list. Do not pass this arguments.
+                              It is only to be used from the function itself.
+    :return: The result path and the steps the algorithm made before reaching the goal node.
+    """
     if stack is None:
         stack = []
     if steps_to_solution is None:
@@ -35,11 +45,15 @@ def dfs(_g, _node, stack=None, steps_to_solution=None):
         return [], steps_to_solution
 
 
-def solve_dfs(g=None, root_node=None):
+def solve_dfs(g, root_node):
+    """
+    Solve the problem by running a dfs on the provided graph starting from the provided node. Plots the problem graph,
+    the result graph (path from root to goal) and the state of the dfs after each iteration.
+
+    :param g: The problem graph.
+    :param root_node: The starting node of the graph.
+    """
     # #################### Preparation #################### #
-    # Build problem graph
-    if g is None or root_node is None:
-        g, root_node = graph.problem_graph()
 
     # Prepare problem graph's plot data 
     pos, color_map, labels = graph.prepare_plot_data(g)
@@ -165,15 +179,14 @@ def solve_dfs(g=None, root_node=None):
             # Draw the state graph using smaller node and font sizes
             graph.draw_network(g_state, pos_state, color_map_state, labels_state, node_size=250, font_size=6)
 
+    # Remove ticks from the axes
     graph.clear_axes(axes2)
 
     plt.savefig("dist/DFS_Solution_Steps_Figure.png", bbox_inches='tight')
-
-    return g, root_node
 
 
 if __name__ == "__main__":
     import os
     if not os.path.exists('dist'):
         os.makedirs('dist')
-    solve_dfs()
+    solve_dfs(*graph.problem_graph())
