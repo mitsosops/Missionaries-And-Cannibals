@@ -59,7 +59,7 @@ def solve_dfs():
     graph.draw_network(g, pos, color_map, labels)
 
     # #################### Solution #################### #
-    # Run DFS on the problem graph and keep the search steps in a separate variable for plotting
+    # Run DFS on the problem graph and keep the search steps in a separate variable for plotting.
     # This implementation of DFS stops traversing the tree when it visits a bad node,
     # where the cannibals end up eating the missionaries, as if it were a leaf node.
     # That means that the bad node is removed from the stack and the traversal continues with its next sibling. It

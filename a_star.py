@@ -10,6 +10,8 @@ from matplotlib.colors import to_rgba
 
 def heuristic(_g, _node, scale = 1.0):
     # Get the min weight of the adjacent edges which is the shortest distance to the end
+    # A scale is used to set the importance of the heuristic function (h(n)) when calculating the estimated distance to goal (f(n))
+    # against the cost - distance from start (g(n))
     if _g.nodes[_node]['is_goal']:
         return 0
     return min([edge[2]['weight'] for edge in _g.edges(_node, data=True)]) * scale
@@ -51,6 +53,9 @@ def a_star(_g, _node):
 
             origins[neighbor] = current_node
             distance_from_start[neighbor] = neighbor_distance_from_start
+            # In this problem, most of the time, getting closer to the goal (minimizing straight line distance)
+            # is the best path since there are no concave obstacles. Hence, an arbitary scale of 2 is chosen to 
+            # make the heuristic twice as important as cost - distance from the start.
             estimated_distance_to_goal[neighbor] = neighbor_distance_from_start + heuristic(_g, neighbor, scale=2)
             
         steps_to_solution.append({'current_node': current_node, 'frontier': list(frontier), 'visited': list(visited)})
@@ -100,7 +105,15 @@ def solve_a_star():
     graph.draw_network(g, pos, color_map, labels, draw_weights=True)
 
     # #################### Solution #################### #
-
+    # Run A* on the problem graph and keep the search steps in a separate variable for plotting.
+    # This implementation of A* ignores the bad nodes, where the cannibals end up eating the missionaries.
+    # The bad nodes are considered obstacles and thus they are never added to the frontier.
+    # This implementation of A* uses a scalable straight distance to goal heuristic.
+    # Since the graphs for these types of problems are relatively simple,
+    # a stronger heuristic usually gives us the best path in the shortest time possible (steps/iterations).
+    # Therefore a scale parameter is added to the heuristic function.
+    # As for the solution steps, the following information is tracked for each one of them: current node, frontier nodes and visited nodes.
+    # This allows us to plot the whole graph verbosely, knowing exactly the state of the A* after each iteration.
     a_star_result, a_star_steps = a_star(g, root_node)
 
     # Make a copy of the problem network and discard the nodes that were not used in the solution
@@ -169,18 +182,20 @@ def solve_a_star():
             # Subtracting the pop count from the step number (idx) results in the actual DFS step number
             plt.title('Step ' + str(idx))
 
+            # Get the data of the current step (A* state)
             step_data = a_star_steps[idx - 1]
 
             # Prepare plot data for the current step
             pos_step, color_map_step, labels_step = graph.prepare_plot_data(g)
 
+            # Create a new color map for our nodes, that better depicts the state of the A* at each step
             color_map_step = set_a_star_colors(g, step_data['current_node'], step_data['frontier'], step_data['visited'])
 
             # Draw the step graph using smaller node and font sizes
             graph.draw_network(g, pos_step, color_map_step, labels_step, node_size=250, font_size=6)
 
+    # Add a legend describing the purpose of each color in the new colormap
     graph.clear_axes(axes2)
-
     legend_elements = [Line2D([0], [0], marker='o', color='gainsboro',
                               label='Unvisited Node', markerfacecolor='gainsboro', markersize=10),
                        Line2D([0], [0], marker='o', color='palevioletred',
